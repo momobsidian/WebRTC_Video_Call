@@ -20,41 +20,87 @@ const database = getDatabase(app);
 // WebRTC configuration
 const configuration = {
     iceServers: [
-        // Google STUN servers
+        // ── Google STUN servers (most reliable) ──────────────────
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' },
         { urls: 'stun:stun2.l.google.com:19302' },
         { urls: 'stun:stun3.l.google.com:19302' },
         { urls: 'stun:stun4.l.google.com:19302' },
-        // Additional STUN servers for better reliability
+
+        // ── Additional public STUN servers ───────────────────────
+        { urls: 'stun:stun.cloudflare.com:3478' },
         { urls: 'stun:stun.services.mozilla.com' },
         { urls: 'stun:stun.stunprotocol.org:3478' },
-        // Metered TURN servers
+        { urls: 'stun:stun.ekiga.net' },
+        { urls: 'stun:stun.ideasip.com' },
+        { urls: 'stun:stun.schlund.de' },
+
+        // ── OpenRelay TURN (metered.ca) — UDP, TCP, TLS ──────────
+        // Port 80 (goes through most firewalls)
         {
             urls: 'turn:openrelay.metered.ca:80',
             username: 'openrelayproject',
             credential: 'openrelayproject'
         },
+        // Port 443 (HTTPS port — passes almost all firewalls)
         {
             urls: 'turn:openrelay.metered.ca:443',
             username: 'openrelayproject',
             credential: 'openrelayproject'
         },
+        // Port 443 over TCP (most reliable through strict NATs)
         {
             urls: 'turn:openrelay.metered.ca:443?transport=tcp',
             username: 'openrelayproject',
             credential: 'openrelayproject'
         },
-        // Additional free TURN servers
+        // Standard TURN port
         {
-            urls: 'turn:numb.viagenie.ca',
-            username: 'webrtc@live.com',
-            credential: 'muazkh'
+            urls: 'turn:openrelay.metered.ca:3478',
+            username: 'openrelayproject',
+            credential: 'openrelayproject'
+        },
+        // Standard TURN port over TCP
+        {
+            urls: 'turn:openrelay.metered.ca:3478?transport=tcp',
+            username: 'openrelayproject',
+            credential: 'openrelayproject'
+        },
+
+        // ── relay.metered.ca (alternate metered domain) ──────────
+        {
+            urls: 'turn:relay.metered.ca:80',
+            username: 'openrelayproject',
+            credential: 'openrelayproject'
         },
         {
-            urls: 'turn:turn.bistri.com:80',
-            username: 'homeo',
-            credential: 'homeo'
+            urls: 'turn:relay.metered.ca:443',
+            username: 'openrelayproject',
+            credential: 'openrelayproject'
+        },
+        {
+            urls: 'turn:relay.metered.ca:443?transport=tcp',
+            username: 'openrelayproject',
+            credential: 'openrelayproject'
+        },
+
+        // ── freeice / freestun.net ───────────────────────────────
+        { urls: 'stun:freestun.net:3479' },
+        {
+            urls: 'turn:freestun.net:3479',
+            username: 'free',
+            credential: 'free'
+        },
+        {
+            urls: 'turn:freestun.net:5350',
+            username: 'free',
+            credential: 'free'
+        },
+        // TURNS (TLS) for maximum firewall penetration
+        {
+            urls: 'turns:freestun.net:5350',
+            username: 'free',
+            credential: 'free'
         }
     ],
     iceCandidatePoolSize: 10,
@@ -62,6 +108,7 @@ const configuration = {
     bundlePolicy: 'max-bundle',
     rtcpMuxPolicy: 'require'
 };
+
 
 // Global variables
 let localStream = null;
