@@ -29,9 +29,13 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
     
     def log_message(self, format, *args):
-        """Custom logging with timestamps"""
+        """Custom logging with timestamps — suppress noisy cache warnings"""
+        msg = format % args
+        # Suppress harmless cache deserialization noise
+        if 'Cache entry deserialization failed' in msg:
+            return
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        sys.stdout.write(f"[{timestamp}] {format % args}\n")
+        sys.stdout.write(f"[{timestamp}] {msg}\n")
         sys.stdout.flush()
 
 def run_server():
