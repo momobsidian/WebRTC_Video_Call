@@ -1,6 +1,7 @@
 services:
   - type: web
     name: momo-vid
-    runtime: python
+    runtime: static
+    staticPublishPath: .
     buildCommand: echo "No build required"
-    startCommand: python3 server.py
+    pullRequestPreviewsEnabled: false
